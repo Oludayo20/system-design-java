@@ -1,0 +1,53 @@
+server:
+  port: ${PORT:3000}
+
+spring:
+  application:
+    name: eshop-modular-monolith
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:eshop}?stringtype=unspecified
+    username: ${POSTGRES_USER:eshop}
+    password: ${POSTGRES_PASSWORD:eshop_dev_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Never true here: schema changes ship as reviewed Flyway migrations
+      # (src/main/resources/db/migration), not drift-on-boot.
+      ddl-auto: none
+    show-sql: false
+
+  flyway:
+    enabled: true
+    # Migrations fully qualify every object with its owning schema (identity/catalog/basket/
+    # ordering) and create those schemas themselves in V1; Flyway's own history table lives in
+    # the connection's default schema ("public").
+    baseline-on-migrate: true
+
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+
+  rabbitmq:
+    addresses: ${RABBITMQ_URL:amqp://localhost:5672}
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+identity:
+  jwt:
+    secret: ${JWT_SECRET:change_me_in_production_please}
+    expires-in: ${JWT_EXPIRES_IN:1h}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.systemdesign.modularmonolith: info

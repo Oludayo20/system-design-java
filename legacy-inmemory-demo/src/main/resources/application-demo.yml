@@ -1,0 +1,5 @@
+# Profile used by the "demo" runner (see com.systemdesign.legacyinmemory.demo.DemoRunner),
+# the port equivalent of `npm run demo` (scripts/demo.js), which in the original spins up
+# its own throwaway server on port 4500 for Act 1 before running Acts 2 and 3 and exiting.
+server:
+  port: 4500

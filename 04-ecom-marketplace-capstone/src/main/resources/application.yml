@@ -1,0 +1,75 @@
+# Mirrors src/config/configuration.ts: every value is env-var driven with the
+# same defaults as .env.example, so `docker-compose.yml`'s env block and local
+# `.env` files work unchanged in spirit.
+
+server:
+  port: ${PORT:3000}
+
+spring:
+  application:
+    name: ecom-marketplace-capstone
+  # DataSource/JPA/Flyway auto-configuration is deliberately disabled - this
+  # app wires 4 DataSources (primary + shard0/1/2) by hand in
+  # infrastructure.postgres.*Config, each with its own EntityManagerFactory,
+  # PlatformTransactionManager and Flyway instance. See PrimaryDataSourceConfig
+  # / Shard{0,1,2}DataSourceConfig.
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+  jpa:
+    open-in-view: false
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+  jackson:
+    default-property-inclusion: non_null
+
+springdoc:
+  swagger-ui:
+    path: /docs
+
+# --- App-specific config (mirrors config/configuration.ts's AppConfig) ---
+app:
+  node-env: ${NODE_ENV:development}
+  instance-id: ${INSTANCE_ID:local}
+  shard-count: ${SHARD_COUNT:3}
+
+  jwt:
+    secret: ${JWT_SECRET:change_me_in_production_please}
+    expires-in: ${JWT_EXPIRES_IN:1h}
+
+  rabbitmq:
+    url: ${RABBITMQ_URL:amqp://guest:guest@localhost:5672}
+
+  datasource:
+    primary:
+      host: ${PRIMARY_DB_HOST:localhost}
+      port: ${PRIMARY_DB_PORT:5432}
+      username: ${PRIMARY_DB_USER:oja}
+      password: ${PRIMARY_DB_PASSWORD:oja_dev_password}
+      database: ${PRIMARY_DB_NAME:oja_primary}
+    shard0:
+      host: ${SHARD0_DB_HOST:localhost}
+      port: ${SHARD0_DB_PORT:5433}
+      username: ${SHARD0_DB_USER:oja}
+      password: ${SHARD0_DB_PASSWORD:oja_dev_password}
+      database: ${SHARD0_DB_NAME:oja_shard0}
+    shard1:
+      host: ${SHARD1_DB_HOST:localhost}
+      port: ${SHARD1_DB_PORT:5434}
+      username: ${SHARD1_DB_USER:oja}
+      password: ${SHARD1_DB_PASSWORD:oja_dev_password}
+      database: ${SHARD1_DB_NAME:oja_shard1}
+    shard2:
+      host: ${SHARD2_DB_HOST:localhost}
+      port: ${SHARD2_DB_PORT:5435}
+      username: ${SHARD2_DB_USER:oja}
+      password: ${SHARD2_DB_PASSWORD:oja_dev_password}
+      database: ${SHARD2_DB_NAME:oja_shard2}
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [${app.instance-id:local}] %-5level %logger{36} - %msg%n"

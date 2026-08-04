@@ -1,0 +1,20 @@
+server:
+  port: ${PORT:3000}
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: database-sharding-demo
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+# springdoc-openapi: UI at /docs, JSON at /docs-json - mirrors the original's
+# SwaggerModule.setup('docs', ...) mount point.
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json

@@ -1,0 +1,55 @@
+server:
+  port: ${PORT:3000}
+
+spring:
+  application:
+    name: async-queue-processing
+
+  # --- PostgreSQL (API/producer only — the worker excludes DataSource/JPA autoconfiguration) ---
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:async_demo}
+    username: ${POSTGRES_USER:async_demo}
+    password: ${POSTGRES_PASSWORD:async_demo_password}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Demo-only, mirrors the original's TypeORM `synchronize`-free approach here: schema is
+      # owned by the Flyway migration below, not by Hibernate DDL generation.
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  # Mirrors Nest's ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }) — unknown
+  # JSON fields on POST /rides are rejected instead of silently dropped.
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+# --- RabbitMQ ---
+# Topic exchange `ride_events`. See README for the full retry/DLQ topology. Parsed manually in
+# RabbitConnectionConfig (host/port/user/pass extracted from this single URL), same shape as the
+# original's amqp-connection-manager usage.
+rabbitmq:
+  url: ${RABBITMQ_URL:amqp://async_demo:async_demo_password@localhost:5672}
+
+# --- Kafka ---
+# Only used by the standalone broadcast-comparison scripts (kafka/*App.java), not by the API/worker.
+kafka:
+  brokers: ${KAFKA_BROKERS:localhost:9092}
+
+# --- Email worker failure simulation ---
+email:
+  failure-rate: ${EMAIL_FAILURE_RATE:0.3}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json
