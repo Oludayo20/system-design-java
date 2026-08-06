@@ -46,6 +46,8 @@ If still failing → return queued/cached fallback
 
 ## Run it
 
+> **Hosting & deployment:** See [HOSTING.md](./HOSTING.md) for Docker setup, platforms (free → paid), production tooling, and per-component checklists. **API docs:** Swagger UI at `/docs` (springdoc-openapi).
+
 ```bash
 cp .env.example .env
 mvn spring-boot:run

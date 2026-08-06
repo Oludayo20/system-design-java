@@ -1,6 +1,7 @@
 package com.systemdesign.captheorem.cluster;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -68,10 +69,22 @@ public class ClusterService {
         return new ReconcileResult(nodeA.productViews(), nodeA.walletBalance());
     }
 
-    public record ViewIncrementResult(boolean accepted, String node, int views) {}
+    @Schema(description = "AP write accepted — product view incremented.")
+    public record ViewIncrementResult(
+            @Schema(example = "true") boolean accepted,
+            @Schema(example = "A") String node,
+            @Schema(example = "1251") int views) {}
 
+    @Schema(description = "CP wallet debit result — rejected during partition or insufficient funds.")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record DebitResult(boolean accepted, Integer balance, String reason) {}
+    public record DebitResult(
+            @Schema(example = "true") boolean accepted,
+            @Schema(example = "4500") Integer balance,
+            @Schema(example = "Partition detected: wallet writes rejected to preserve consistency (CP)")
+            String reason) {}
 
-    public record ReconcileResult(int productViews, int walletBalance) {}
+    @Schema(description = "Post-reconciliation cluster state.")
+    public record ReconcileResult(
+            @Schema(example = "1251") int productViews,
+            @Schema(example = "4500") int walletBalance) {}
 }

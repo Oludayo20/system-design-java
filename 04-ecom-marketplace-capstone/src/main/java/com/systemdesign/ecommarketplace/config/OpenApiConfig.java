@@ -28,8 +28,11 @@ public class OpenApiConfig {
             new Info()
                 .title("Oja Marketplace Capstone API")
                 .description(
-                    "Modular monolith + sharded Postgres (Users/Wallet) + RabbitMQ async workers,"
-                        + " behind Nginx with 2 API replicas.")
+                    "Full-stack system design capstone (Spring Boot): modular monolith + sharded Postgres"
+                        + " (Users/Wallet) + async RabbitMQ workers + Redis cache + horizontal scaling"
+                        + " behind Nginx.\n\n"
+                        + "Public routes: auth/*, marketplace/*, health. Protected: users/me, wallet/me,"
+                        + " orders — register/login first, then Authorize with the JWT.")
                 .version("1.0"))
         .components(
             new Components()

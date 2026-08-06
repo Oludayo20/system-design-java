@@ -16,6 +16,17 @@ migrations) instead of NestJS/TypeScript and TypeORM.
 | 5 | [`05-resilience`](./05-resilience) | **Level 6:** retries, circuit breakers, provider fallback, graceful degradation | Spring Boot (in-memory flaky payment demo) |
 | 6 | [`06-cap-theorem`](./06-cap-theorem) | **Level 7:** CAP tradeoffs — AP product views vs CP wallet debits, partition simulation | Spring Boot (in-memory two-node cluster) |
 
+Each project has a **[HOSTING.md](./01-modular-monolith/HOSTING.md)** guide: local Docker setup, platforms (free → paid), production tooling, and per-component checklists.
+
+| Project | Hosting guide |
+|---------|---------------|
+| 01 Modular monolith | [`01-modular-monolith/HOSTING.md`](./01-modular-monolith/HOSTING.md) |
+| 02 Database sharding | [`02-database-sharding/HOSTING.md`](./02-database-sharding/HOSTING.md) |
+| 03 Async queues | [`03-async-queue-processing/HOSTING.md`](./03-async-queue-processing/HOSTING.md) |
+| 04 Oja capstone | [`04-ecom-marketplace-capstone/HOSTING.md`](./04-ecom-marketplace-capstone/HOSTING.md) |
+| 05 Resilience | [`05-resilience/HOSTING.md`](./05-resilience/HOSTING.md) |
+| 06 CAP theorem | [`06-cap-theorem/HOSTING.md`](./06-cap-theorem/HOSTING.md) |
+
 See [`LEVELS-6-7.md`](./LEVELS-6-7.md) for the full concept write-up on resilience and CAP theorem.
 
 `legacy-inmemory-demo/` is a Java port of the original single-process, in-memory simulation. Like
@@ -43,6 +54,8 @@ cp .env.example .env
 docker compose up -d          # starts Postgres/Redis/RabbitMQ/etc.
 mvn spring-boot:run           # or: mvn clean package && java -jar target/*.jar
 ```
+
+Interactive **Swagger API docs** (springdoc-openapi) are available at `http://localhost:<port>/docs` once the API is running (ports: 3000 for 01–04, 3005 for 05, 3006 for 06). Every HTTP endpoint is documented with request/response schemas.
 
 See each project's own README for exact endpoints and things to try.
 

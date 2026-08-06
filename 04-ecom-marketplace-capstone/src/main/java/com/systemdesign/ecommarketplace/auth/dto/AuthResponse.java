@@ -1,4 +1,8 @@
 package com.systemdesign.ecommarketplace.auth.dto;
 
-/** Mirrors AuthService.register/login's return shape: { accessToken, user }. */
-public record AuthResponse(String accessToken, AuthUserSummary user) {}
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "JWT access token and user summary.")
+public record AuthResponse(
+        @Schema(description = "JWT bearer token for protected routes.") String accessToken,
+        AuthUserSummary user) {}

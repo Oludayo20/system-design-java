@@ -307,6 +307,8 @@ scripts/
 
 ## Running it
 
+> **Hosting & deployment:** See [HOSTING.md](./HOSTING.md) for Docker setup, platforms (free → paid), production tooling, and per-component checklists. **API docs:** Swagger UI at `/docs` (springdoc-openapi).
+
 ### Prerequisites
 
 Docker (Postgres, RabbitMQ, Kafka) + Java 21 / Maven for `mvn package`/`mvn test` locally.

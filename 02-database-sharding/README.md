@@ -238,6 +238,8 @@ src/test/java/...                     JUnit 5 ports of the *.spec.ts test suites
 
 ## Running it
 
+> **Hosting & deployment:** See [HOSTING.md](./HOSTING.md) for Docker setup, platforms (free → paid), production tooling, and per-component checklists. **API docs:** Swagger UI at `/docs` (springdoc-openapi).
+
 Requires Docker (for the three Postgres shards) and Java 21 + Maven.
 
 ```bash

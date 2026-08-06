@@ -102,6 +102,8 @@ src/main/java/com/systemdesign/modularmonolith/
 
 ## Running it
 
+> **Hosting & deployment:** See [HOSTING.md](./HOSTING.md) for Docker setup, platforms (free → paid), production tooling, and per-component checklists. **API docs:** Swagger UI at `/docs` (springdoc-openapi).
+
 ### Prerequisites
 
 - Docker + Docker Compose (recommended path), **or** Java 21, Maven, PostgreSQL 16, Redis 7,

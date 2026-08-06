@@ -4,6 +4,9 @@ import com.systemdesign.databasesharding.users.dto.CreateUserDto;
 import com.systemdesign.databasesharding.users.dto.ShardDistributionResponseDto;
 import com.systemdesign.databasesharding.users.dto.UserResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Mirrors users.controller.ts. */
-@Tag(name = "users")
+@Tag(name = "users", description = "Sharded user CRUD and debug distribution")
 @RestController
 @RequestMapping("/users")
 public class UsersController {
@@ -30,27 +32,32 @@ public class UsersController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Create a user. Generates a global id, then routes to one shard.")
-    @ApiResponse(responseCode = "201")
+    @Operation(
+            summary = "Create a user",
+            description = "Generates a global ID first, then routes the record to exactly one shard using SHARDING_STRATEGY.")
+    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = UserResponseDto.class)))
     public UserResponseDto create(@Valid @RequestBody CreateUserDto dto) {
         return usersService.create(dto);
     }
 
     @GetMapping("/_debug/distribution")
     @Operation(
-            summary = "DEBUG/OPS ONLY: COUNT(*) on every shard to visualize load distribution.",
-            description = "The one endpoint in this service allowed to query every shard. Never used on the hot path."
-    )
-    @ApiResponse(responseCode = "200")
+            summary = "DEBUG: per-shard row counts",
+            description = "The only endpoint allowed to query every shard. Never use on the production hot path.")
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ShardDistributionResponseDto.class)))
     public ShardDistributionResponseDto getDistribution() {
         return usersService.getShardDistribution();
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Fetch a user. Resolves the owning shard and queries only that one.")
-    @ApiResponse(responseCode = "200")
+    @Operation(
+            summary = "Fetch a user by ID",
+            description = "Computes shard(id) and queries only that shard. Geo strategy returns 400 — cannot resolve shard from id alone.")
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = UserResponseDto.class)))
     @ApiResponse(responseCode = "404", description = "User not found on its resolved shard.")
-    public UserResponseDto findById(@PathVariable String id) {
+    @ApiResponse(responseCode = "400", description = "Geo strategy: cannot resolve shard from id alone.")
+    public UserResponseDto findById(
+            @Parameter(description = "Numeric user ID", example = "1927841923837952") @PathVariable String id) {
         return usersService.findById(id);
     }
 }

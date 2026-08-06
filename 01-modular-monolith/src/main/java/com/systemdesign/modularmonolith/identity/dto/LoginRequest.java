@@ -1,11 +1,11 @@
 package com.systemdesign.modularmonolith.identity.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-/** Mirrors {@code login.dto.ts}. */
+@Schema(description = "Login credentials.")
 public record LoginRequest(
-        @NotBlank @Email String email,
-        @NotBlank String password
-) {
+        @Schema(example = "jane.doe@example.com") @NotBlank @Email String email,
+        @Schema(example = "S3curePassword!") @NotBlank String password) {
 }

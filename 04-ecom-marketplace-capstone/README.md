@@ -179,6 +179,8 @@ is disabled (`EcomMarketplaceCapstoneApplication`'s `@SpringBootApplication(excl
 
 ## Running it
 
+> **Hosting & deployment:** See [HOSTING.md](./HOSTING.md) for Docker setup, platforms (free → paid), production tooling, and per-component checklists. **API docs:** Swagger UI at `/docs` (springdoc-openapi).
+
 ```bash
 cd 04-ecom-marketplace-capstone
 cp .env.example .env
