@@ -1,0 +1,46 @@
+server:
+  port: ${ORDER_API_PORT:3009}
+
+spring:
+  application:
+    name: order-api
+
+  # order-api owns order-db exclusively — no other app in this project touches it. Compare with
+  # inventory-consumer, which owns inventory-db exclusively. Each side of a pub/sub event owns
+  # its own storage; there is no shared database.
+  datasource:
+    url: jdbc:postgresql://${ORDER_DB_HOST:localhost}:${ORDER_DB_PORT:5434}/${ORDER_DB_NAME:order_db}
+    username: ${ORDER_DB_USER:freshcart}
+    password: ${ORDER_DB_PASSWORD:freshcart_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+  rabbitmq:
+    addresses: ${RABBITMQ_URL:amqp://freshcart:freshcart_password@localhost:5672}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json
+
+logging:
+  level:
+    com.systemdesign.freshcart: info

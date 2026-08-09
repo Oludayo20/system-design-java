@@ -1,0 +1,42 @@
+server:
+  port: ${PORT:4001}
+
+spring:
+  application:
+    name: bookhive-auth-service
+
+  datasource:
+    url: jdbc:postgresql://${AUTH_DB_HOST:localhost}:${AUTH_DB_PORT:5432}/${AUTH_DB_NAME:auth_db}?stringtype=unspecified
+    username: ${AUTH_DB_USER:bookhive}
+    password: ${AUTH_DB_PASSWORD:bookhive_dev_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Schema changes ship as reviewed Flyway migrations (src/main/resources/db/migration),
+      # not drift-on-boot.
+      ddl-auto: none
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+jwt:
+  secret: ${JWT_SECRET:change_me_in_production_please}
+  expires-in: ${JWT_EXPIRES_IN:1h}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json
+
+logging:
+  level:
+    com.systemdesign.bookhive.auth: info

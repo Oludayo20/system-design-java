@@ -1,0 +1,24 @@
+target/
+*.class
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+
+# Maven wrapper (optional; keep repo lean)
+.mvn/wrapper/maven-wrapper.jar

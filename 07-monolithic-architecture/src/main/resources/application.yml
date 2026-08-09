@@ -1,0 +1,43 @@
+server:
+  port: ${PORT:3007}
+
+spring:
+  application:
+    name: blogstack
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:blogstack}?stringtype=unspecified
+    username: ${POSTGRES_USER:blogstack}
+    password: ${POSTGRES_PASSWORD:blogstack_dev_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Never true here: schema changes ship as reviewed Flyway migrations
+      # (src/main/resources/db/migration), not drift-on-boot.
+      ddl-auto: none
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+auth:
+  jwt:
+    secret: ${JWT_SECRET:change_me_in_production_please}
+    expires-in: ${JWT_EXPIRES_IN:1h}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.systemdesign.blogstack: info

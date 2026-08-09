@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: library-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-library}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-library_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-library}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-library} -d ${POSTGRES_DB:-library}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: library-api
+    environment:
+      PORT: 3011
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-library}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-library_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-library}
+    ports:
+      - '3011:3011'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Flyway runs automatically on boot (spring.flyway.enabled=true).
+
+volumes:
+  postgres_data:

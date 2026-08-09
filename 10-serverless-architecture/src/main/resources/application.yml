@@ -1,0 +1,31 @@
+server:
+  port: ${PORT:3010}
+
+spring:
+  application:
+    name: serverless-architecture
+
+  # Queue trigger only (simulates SQS -> Lambda). Full amqp:// URI with embedded credentials is
+  # supported directly in spring.rabbitmq.addresses — same convention as 01-modular-monolith.
+  rabbitmq:
+    addresses: ${RABBITMQ_URL:amqp://serverless_demo:serverless_demo_password@localhost:5673}
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+# --- Execution environment manager ---
+faas:
+  warm-ttl-ms: ${WARM_TTL_MS:60000}
+  cold-start-latency-ms: ${COLD_START_LATENCY_MS:400}
+  schedule-interval-ms: ${SCHEDULE_INTERVAL_MS:30000}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json
+
+logging:
+  level:
+    com.systemdesign.faas: info

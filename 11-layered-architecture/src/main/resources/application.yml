@@ -1,0 +1,40 @@
+server:
+  port: ${PORT:3011}
+
+spring:
+  application:
+    name: riverside-library
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:library}?stringtype=unspecified
+    username: ${POSTGRES_USER:library}
+    password: ${POSTGRES_PASSWORD:library_dev_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Never true here: schema changes ship as reviewed Flyway migrations
+      # (src/main/resources/db/migration), not drift-on-boot.
+      ddl-auto: none
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  mvc:
+    problemdetails:
+      # Domain errors (ResponseStatusException thrown by the Application layer) come back as
+      # RFC 7807 JSON bodies with a "detail" field carrying the domain error's message.
+      enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.systemdesign.library: info
