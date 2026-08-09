@@ -1,0 +1,65 @@
+server:
+  port: ${PORT:3012}
+
+spring:
+  application:
+    name: orbit-hexagonal-architecture
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+app:
+  # Selects which SubscriptionRepositoryPort adapter CoreBeansConfig binds: memory | postgres.
+  # Nothing under core/ reads this property — see README.md "Swap a database".
+  repository: ${APP_REPOSITORY:memory}
+  # Selects which PaymentGatewayPort adapter CoreBeansConfig binds: stripe | flutterwave.
+  payment-provider: ${APP_PAYMENT_PROVIDER:stripe}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json
+
+logging:
+  level:
+    com.systemdesign.orbit: info
+
+---
+# Activated only when APP_REPOSITORY=postgres (OrbitApplication#main adds this profile itself —
+# see the comment there for why). DataSource/JPA/Flyway autoconfiguration is excluded by default
+# on OrbitApplication and re-imported only by config.PostgresPersistenceConfig, which is itself
+# @Profile("postgres"). In "memory" mode none of this ever runs — no connection is attempted.
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:orbit}
+    username: ${POSTGRES_USER:orbit}
+    password: ${POSTGRES_PASSWORD:orbit_dev_password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Never true here: schema changes ship as reviewed Flyway migrations
+      # (src/main/resources/db/migration), not drift-on-boot.
+      ddl-auto: none
+    show-sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+---
+# Activated only when running the CLI adapter (mvn spring-boot:run -Dspring-boot.run.profiles=cli
+# [,postgres]). No embedded web server needed — the CLI runs one command and exits.
+spring:
+  config:
+    activate:
+      on-profile: cli
+  main:
+    web-application-type: none
+    banner-mode: off
+logging:
+  level:
+    root: warn

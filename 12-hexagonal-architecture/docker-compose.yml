@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: orbit-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-orbit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-orbit_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-orbit}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-orbit} -d ${POSTGRES_DB:-orbit}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: orbit-api
+    environment:
+      PORT: 3012
+      # Adapter selection — swap these without touching src/main/java/com/systemdesign/orbit/core
+      # (see README.md). Docker Compose always has Postgres available, so postgres is the sensible
+      # default here even though the standalone (no-Docker) default in .env.example is memory.
+      APP_REPOSITORY: ${APP_REPOSITORY:-postgres}
+      APP_PAYMENT_PROVIDER: ${APP_PAYMENT_PROVIDER:-stripe}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-orbit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-orbit_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-orbit}
+    ports:
+      - '3012:3012'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Flyway runs automatically on boot when APP_REPOSITORY=postgres (the "postgres" Spring
+    # profile is activated by OrbitApplication's main() based on that same env var).
+
+volumes:
+  postgres_data:

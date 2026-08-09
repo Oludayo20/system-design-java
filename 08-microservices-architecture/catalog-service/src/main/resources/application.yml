@@ -1,0 +1,40 @@
+server:
+  port: ${PORT:4002}
+
+spring:
+  application:
+    name: bookhive-catalog-service
+
+  datasource:
+    url: jdbc:postgresql://${CATALOG_DB_HOST:localhost}:${CATALOG_DB_PORT:5432}/${CATALOG_DB_NAME:catalog_db}?stringtype=unspecified
+    username: ${CATALOG_DB_USER:bookhive}
+    password: ${CATALOG_DB_PASSWORD:bookhive_dev_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+jwt:
+  # catalog-service only ever VERIFIES tokens issued by auth-service - it never signs one.
+  secret: ${JWT_SECRET:change_me_in_production_please}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json
+
+logging:
+  level:
+    com.systemdesign.bookhive.catalog: info

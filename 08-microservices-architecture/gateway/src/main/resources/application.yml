@@ -1,0 +1,20 @@
+server:
+  port: ${PORT:3008}
+
+spring:
+  application:
+    name: bookhive-gateway
+
+routes:
+  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:4001}
+  catalog-service-url: ${CATALOG_SERVICE_URL:http://localhost:4002}
+  order-service-url: ${ORDER_SERVICE_URL:http://localhost:4003}
+  notification-service-url: ${NOTIFICATION_SERVICE_URL:http://localhost:4004}
+
+rate-limit:
+  capacity: ${RATE_LIMIT_CAPACITY:20}
+  refill-per-sec: ${RATE_LIMIT_REFILL_PER_SEC:10}
+
+logging:
+  level:
+    com.systemdesign.bookhive.gateway: info

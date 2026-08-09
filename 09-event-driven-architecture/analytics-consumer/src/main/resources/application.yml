@@ -1,0 +1,13 @@
+server:
+  port: ${ANALYTICS_CONSUMER_PORT:4103}
+
+spring:
+  application:
+    name: analytics-consumer
+
+  rabbitmq:
+    addresses: ${RABBITMQ_URL:amqp://freshcart:freshcart_password@localhost:5672}
+
+logging:
+  level:
+    com.systemdesign.freshcart: info

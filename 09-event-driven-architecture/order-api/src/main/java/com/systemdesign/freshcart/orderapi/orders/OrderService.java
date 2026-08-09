@@ -3,7 +3,7 @@ package com.systemdesign.freshcart.orderapi.orders;
 import com.systemdesign.freshcart.orderapi.orders.dto.CreateOrderDto;
 import com.systemdesign.freshcart.orderapi.orders.dto.OrderItemDto;
 import com.systemdesign.freshcart.orderapi.orders.dto.OrderResponseDto;
-import jakarta.persistence.EntityNotFoundException;
+import com.systemdesign.freshcart.orderapi.shared.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -102,7 +102,7 @@ public class OrderService {
 
     public OrderResponseDto getOrder(UUID id) {
         Order order = orders.findByIdWithItems(id)
-                .orElseThrow(() -> new EntityNotFoundException("Order " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException("Order " + id + " not found"));
         return OrderResponseDto.from(order);
     }
 

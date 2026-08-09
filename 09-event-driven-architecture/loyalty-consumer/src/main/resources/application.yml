@@ -1,0 +1,13 @@
+server:
+  port: ${LOYALTY_CONSUMER_PORT:4104}
+
+spring:
+  application:
+    name: loyalty-consumer
+
+  rabbitmq:
+    addresses: ${RABBITMQ_URL:amqp://freshcart:freshcart_password@localhost:5672}
+
+logging:
+  level:
+    com.systemdesign.freshcart: info

@@ -1,0 +1,40 @@
+server:
+  port: ${INVENTORY_CONSUMER_PORT:4101}
+
+spring:
+  application:
+    name: inventory-consumer
+
+  # Owned exclusively by inventory-consumer. order-api and the other consumers never touch it —
+  # each consumer that needs durable state owns its own database, the same way each consumer
+  # owns its own queue.
+  datasource:
+    url: jdbc:postgresql://${INVENTORY_DB_HOST:localhost}:${INVENTORY_DB_PORT:5433}/${INVENTORY_DB_NAME:inventory_db}
+    username: ${INVENTORY_DB_USER:freshcart}
+    password: ${INVENTORY_DB_PASSWORD:freshcart_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+
+  rabbitmq:
+    addresses: ${RABBITMQ_URL:amqp://freshcart:freshcart_password@localhost:5672}
+
+logging:
+  level:
+    com.systemdesign.freshcart: info

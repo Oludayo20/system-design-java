@@ -1,0 +1,16 @@
+server:
+  port: ${PORT:4004}
+
+spring:
+  application:
+    name: bookhive-notification-service
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json
+
+logging:
+  level:
+    com.systemdesign.bookhive.notification: info

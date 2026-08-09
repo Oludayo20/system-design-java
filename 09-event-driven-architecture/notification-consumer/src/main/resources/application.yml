@@ -1,0 +1,13 @@
+server:
+  port: ${NOTIFICATION_CONSUMER_PORT:4102}
+
+spring:
+  application:
+    name: notification-consumer
+
+  rabbitmq:
+    addresses: ${RABBITMQ_URL:amqp://freshcart:freshcart_password@localhost:5672}
+
+logging:
+  level:
+    com.systemdesign.freshcart: info

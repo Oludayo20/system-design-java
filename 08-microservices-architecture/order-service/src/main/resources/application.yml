@@ -1,0 +1,52 @@
+server:
+  port: ${PORT:4003}
+
+spring:
+  application:
+    name: bookhive-order-service
+
+  datasource:
+    url: jdbc:postgresql://${ORDER_DB_HOST:localhost}:${ORDER_DB_PORT:5432}/${ORDER_DB_NAME:order_db}?stringtype=unspecified
+    username: ${ORDER_DB_USER:bookhive}
+    password: ${ORDER_DB_PASSWORD:bookhive_dev_password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+jwt:
+  # order-service only ever VERIFIES tokens issued by auth-service - it never signs one.
+  secret: ${JWT_SECRET:change_me_in_production_please}
+
+# Network addresses, not database credentials - this is the ONLY way order-service reaches
+# catalog data or triggers a notification. Notice there is no CATALOG_DB_* or AUTH_DB_*
+# property anywhere in this file.
+catalog:
+  service-url: ${CATALOG_SERVICE_URL:http://localhost:4002}
+
+notification:
+  service-url: ${NOTIFICATION_SERVICE_URL:http://localhost:4004}
+  # How long order-service waits on the fire-and-forget notification call before giving up and
+  # swallowing the error (fault isolation, see README).
+  timeout-ms: ${NOTIFICATION_TIMEOUT_MS:2000}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /docs-json
+
+logging:
+  level:
+    com.systemdesign.bookhive.order: info
