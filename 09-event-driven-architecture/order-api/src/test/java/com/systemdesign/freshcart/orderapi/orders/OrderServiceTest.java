@@ -10,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -26,7 +27,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,7 +47,7 @@ class OrderServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private org.springframework.amqp.rabbit.core.RabbitTemplate rabbitTemplate;
+    private AmqpTemplate rabbitTemplate;
 
     private TransactionTemplate transactionTemplate;
     private OrderService orderService;
@@ -57,12 +57,15 @@ class OrderServiceTest {
     void setUp() {
         // A TransactionTemplate stand-in that just invokes the callback synchronously — good
         // enough to prove ordering (save must finish before the callback returns) without a real
-        // PlatformTransactionManager/DataSource.
-        transactionTemplate = mock(TransactionTemplate.class);
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            return callback.doInTransaction(null);
-        });
+        // PlatformTransactionManager/DataSource. A real subclass override (not a Mockito mock of
+        // this concrete class) so the test doesn't depend on Mockito's inline mock maker being
+        // able to instrument java.lang/Spring framework classes on whatever JDK runs the build.
+        transactionTemplate = new TransactionTemplate() {
+            @Override
+            public <T> T execute(TransactionCallback<T> action) {
+                return action.doInTransaction(null);
+            }
+        };
 
         orderService = new OrderService(orderRepository, transactionTemplate, rabbitTemplate);
 
@@ -109,8 +112,7 @@ class OrderServiceTest {
     void savesInsideTheTransactionBeforePublishingAfterItCommits() {
         orderService.placeOrder(dto);
 
-        InOrder order = inOrder(transactionTemplate, orderRepository, rabbitTemplate);
-        order.verify(transactionTemplate).execute(any());
+        InOrder order = inOrder(orderRepository, rabbitTemplate);
         order.verify(orderRepository).save(any(Order.class));
         order.verify(rabbitTemplate).convertAndSend(anyString(), anyString(), any(), any(MessagePostProcessor.class));
     }

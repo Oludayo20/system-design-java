@@ -2,16 +2,18 @@ package com.systemdesign.freshcart.inventoryconsumer.stock;
 
 import com.systemdesign.freshcart.inventoryconsumer.rabbitmq.OrderPlacedEvent;
 import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /** Starting catalog. Seeded once on boot so GET /stock has something to show before any order. */
-@Slf4j
 @Service
 public class StockService {
+
+    private static final Logger log = LoggerFactory.getLogger(StockService.class);
 
     private static final List<StockItem> CATALOG_SEED = List.of(
             new StockItem("milk-1l", "Whole Milk 1L", 100),

@@ -246,15 +246,21 @@ docker compose logs -f api | grep queue-trigger
 ```
 
 ```text
-[queue-trigger] message acked — cold=true billed=200ms
-[queue-trigger] message acked — cold=true billed=200ms
+[queue-trigger] message acked — cold=true billed=600ms
+[queue-trigger] message acked — cold=true billed=700ms
+[queue-trigger] message acked — cold=false billed=100ms
 ... (all 10 arrive and get acked in quick succession, not one at a time)
-[queue-trigger] burst complete — peak concurrency=10, cold starts this burst=10
+[queue-trigger] burst complete — peak concurrency=9, cold starts this burst=8
 ```
 
-Because nothing was warm yet, all 10 concurrent messages each spun up their own execution
-instance — the same way Lambda scales out concurrent execution environments to drain an SQS
-backlog. Run the burst again immediately (before `WARM_TTL_MS` elapses) and you'll see a mix of
+Cold billed durations land around `COLD_START_LATENCY_MS` (400) plus the ~80-200ms of simulated
+payment-processing work, rounded up to the nearest 100ms — e.g. ~500-700ms. Because almost nothing
+was warm yet, most of the 10 concurrent messages each spun up their own execution instance — the
+same way Lambda scales out concurrent execution environments to drain an SQS backlog. It's normal
+to see peak concurrency slightly below the burst size (e.g. 9 instead of 10): the fastest workers
+can finish and return their instance to the warm pool before the last messages in the same burst
+are even dequeued, so a couple of "warm" reuses happen organically within one burst. Run the burst
+again immediately (before `WARM_TTL_MS` elapses) and you'll see an even bigger mix of
 warm reuse and cold starts, since some of the first batch's instances are still idle-but-warm.
 
 ```bash

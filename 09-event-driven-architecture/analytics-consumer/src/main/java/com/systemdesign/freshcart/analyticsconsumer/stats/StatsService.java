@@ -1,7 +1,8 @@
 package com.systemdesign.freshcart.analyticsconsumer.stats;
 
 import com.systemdesign.freshcart.analyticsconsumer.rabbitmq.OrderPlacedEvent;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,9 +15,10 @@ import java.util.UUID;
  * independently to order.placed." A production analytics-consumer would write to a proper
  * time-series/warehouse store instead.
  */
-@Slf4j
 @Service
 public class StatsService {
+
+    private static final Logger log = LoggerFactory.getLogger(StatsService.class);
 
     private int ordersToday = 0;
     private BigDecimal revenueToday = BigDecimal.ZERO;

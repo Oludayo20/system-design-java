@@ -1,7 +1,8 @@
 package com.systemdesign.freshcart.notificationconsumer.notifications;
 
 import com.systemdesign.freshcart.notificationconsumer.rabbitmq.OrderPlacedEvent;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -14,9 +15,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * and integrate a push provider (FCM/APNs); the point here is that this consumer reacts to
  * order.placed on its own, with its own storage, on its own schedule.
  */
-@Slf4j
 @Service
 public class NotificationsService {
+
+    private static final Logger log = LoggerFactory.getLogger(NotificationsService.class);
 
     private final List<Notification> notifications = new CopyOnWriteArrayList<>();
 

@@ -4,8 +4,9 @@ import com.systemdesign.freshcart.orderapi.orders.dto.CreateOrderDto;
 import com.systemdesign.freshcart.orderapi.orders.dto.OrderItemDto;
 import com.systemdesign.freshcart.orderapi.orders.dto.OrderResponseDto;
 import com.systemdesign.freshcart.orderapi.shared.exception.NotFoundException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -41,16 +42,17 @@ import static com.systemdesign.freshcart.orderapi.rabbitmq.RabbitMqConstants.ORD
  * already true and durable, not a promise that it will be. See the README "Ordering" section for
  * why this is the one ordering guarantee FreshCart actually needs.
  */
-@Slf4j
 @Service
 public class OrderService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+
     private final OrderRepository orders;
     private final TransactionTemplate transactionTemplate;
-    private final RabbitTemplate rabbitTemplate;
+    private final AmqpTemplate rabbitTemplate;
 
     public OrderService(OrderRepository orders, TransactionTemplate transactionTemplate,
-                         RabbitTemplate rabbitTemplate) {
+                         AmqpTemplate rabbitTemplate) {
         this.orders = orders;
         this.transactionTemplate = transactionTemplate;
         this.rabbitTemplate = rabbitTemplate;

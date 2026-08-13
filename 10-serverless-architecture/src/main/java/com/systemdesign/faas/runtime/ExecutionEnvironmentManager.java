@@ -48,9 +48,14 @@ import org.slf4j.LoggerFactory;
  *       produces N cold starts, same as Lambda scaling out concurrent execution environments.
  *       Claiming a warm instance is a single atomic {@link ConcurrentLinkedDeque#pollFirst()},
  *       so two concurrent invocations can never claim the same idle instance.</li>
- *   <li><b>Billing:</b> real wall-clock handler duration (measured with {@link System#nanoTime()}),
- *       rounded up to the nearest 100ms ("billed duration", AWS's historical Lambda billing
- *       granularity), accumulated per function.</li>
+ *   <li><b>Billing:</b> real wall-clock invocation duration (measured with {@link System#nanoTime()}),
+ *       rounded up to the nearest 100ms ("billed duration", historical Lambda billing
+ *       granularity), accumulated per function. On a cold path the measurement window starts
+ *       before instance construction, so it includes the real construction cost and the injected
+ *       {@code coldStartLatencyMs} delay, not just the handler body — matching real AWS Lambda
+ *       billing since its December 2020 update, which bills Init-phase time on a cold start as
+ *       part of that invocation's duration. This is what makes cold invocations genuinely bill
+ *       for more, not just get flagged differently.</li>
  * </ul>
  */
 public class ExecutionEnvironmentManager {
@@ -126,6 +131,15 @@ public class ExecutionEnvironmentManager {
         }
 
         ConcurrentLinkedDeque<FunctionInstance> pool = pools.get(name);
+
+        // Measurement window starts here, BEFORE the cold-start branch, and covers the whole
+        // invocation lifecycle — construction + injected latency + handler execution on a cold
+        // path, handler execution only on a warm path. This mirrors real AWS Lambda billing since
+        // its December 2020 update: Init-phase time on a cold start is part of the FIRST
+        // invocation's billed duration, not a free pre-invocation cost. It is also what makes
+        // cold vs. warm genuinely, visibly different in billedMs below, not just in the cold flag.
+        long invokeStartNanos = System.nanoTime();
+
         FunctionInstance instance = claimWarmInstance(name, pool);
         boolean cold = instance == null;
 
@@ -146,7 +160,6 @@ public class ExecutionEnvironmentManager {
         String requestId = UUID.randomUUID().toString();
         LambdaContext context = new LambdaContext(name, requestId, cold, Instant.now());
 
-        long invokeStartNanos = System.nanoTime();
         LambdaResponse response;
         try {
             response = instance.handler().handle(event, context);

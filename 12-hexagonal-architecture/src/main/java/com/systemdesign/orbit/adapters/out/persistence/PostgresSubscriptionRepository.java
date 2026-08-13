@@ -20,7 +20,12 @@ public class PostgresSubscriptionRepository implements SubscriptionRepositoryPor
 
     @Override
     public void save(Subscription subscription) {
-        jpaRepository.save(toEntity(subscription));
+        // The id is an application-assigned UUID, never database-generated, so "does a row with
+        // this id already exist" has to be answered explicitly — see the Persistable javadoc on
+        // SubscriptionJpaEntity for why relying on JpaRepository's default isNew() heuristic
+        // silently drops the insert.
+        boolean isNew = !jpaRepository.existsById(subscription.getId());
+        jpaRepository.saveAndFlush(toEntity(subscription, isNew));
     }
 
     @Override
@@ -33,8 +38,9 @@ public class PostgresSubscriptionRepository implements SubscriptionRepositoryPor
         return jpaRepository.findFirstByCustomerIdOrderByCreatedAtDesc(customerId).map(this::toDomain);
     }
 
-    private SubscriptionJpaEntity toEntity(Subscription subscription) {
+    private SubscriptionJpaEntity toEntity(Subscription subscription, boolean isNew) {
         return new SubscriptionJpaEntity(
+                isNew,
                 subscription.getId(),
                 subscription.getCustomerId(),
                 subscription.getPlanId(),

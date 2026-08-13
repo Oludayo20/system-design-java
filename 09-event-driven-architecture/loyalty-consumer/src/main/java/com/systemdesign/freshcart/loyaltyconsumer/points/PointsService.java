@@ -1,7 +1,8 @@
 package com.systemdesign.freshcart.loyaltyconsumer.points;
 
 import com.systemdesign.freshcart.loyaltyconsumer.rabbitmq.OrderPlacedEvent;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
@@ -25,9 +26,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>See {@code scripts.SimulateDuplicateDeliveryApp} for a program that sends the exact same
  * eventId to this consumer's queue twice, and the README for how to run it and read the result.
  */
-@Slf4j
 @Service
 public class PointsService {
+
+    private static final Logger log = LoggerFactory.getLogger(PointsService.class);
 
     private final Map<String, Integer> pointsByCustomer = new ConcurrentHashMap<>();
     private final Set<UUID> processedEventIds = ConcurrentHashMap.newKeySet();

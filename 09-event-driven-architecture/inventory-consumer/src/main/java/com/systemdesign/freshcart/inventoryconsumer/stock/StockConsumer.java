@@ -2,7 +2,6 @@ package com.systemdesign.freshcart.inventoryconsumer.stock;
 
 import com.systemdesign.freshcart.inventoryconsumer.rabbitmq.OrderPlacedEvent;
 import com.systemdesign.freshcart.inventoryconsumer.rabbitmq.RabbitMqConstants;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
  * order-api's source code does not change by a single line (see loyalty-consumer for that proof
  * in action).
  */
-@Slf4j
 @Component
 public class StockConsumer {
 
